@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
  * @description：
  * @date ：2020/9/7 10:42 下午
  */
-public class Counter {
+public class CasCounter {
     private volatile int count = 0;
 
     private static long offset;
@@ -21,10 +21,8 @@ public class Counter {
             Field f = Unsafe.class.getDeclaredField("theUnsafe");
             f.setAccessible(true);
             unsafe = (Unsafe) f.get(null);
-            offset = unsafe.objectFieldOffset(Counter.class.getDeclaredField("count"));
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+            offset = unsafe.objectFieldOffset(CasCounter.class.getDeclaredField("count"));
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -42,27 +40,22 @@ public class Counter {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Counter counter = new Counter();
+        CasCounter casCounter = new CasCounter();
         ExecutorService threadPool = Executors.newFixedThreadPool(100);
-
         // 起100个线程，每个线程自增10000次
         /*IntStream.range(0, 100).forEach(i->
                 threadPool.submit(()->IntStream.range(0, 10000).forEach(j->counter.increment()))
         );*/
-
         for (int i = 0; i < 100; i++) {
             threadPool.submit(() -> {
                 for (int j =0; j < 10000; j++) {
-                    counter.increment();
+                    casCounter.increment();
                 }
             });
         }
-
         threadPool.shutdown();
-
         Thread.sleep(2000);
-
         // 打印1000000
-        System.out.println(counter.getCount());
+        System.out.println(casCounter.getCount());
     }
 }

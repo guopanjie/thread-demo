@@ -6,4 +6,7 @@ package com.gpj.example.thread.pool;
  * @date ：2020/8/26 5:50 下午
  */
 public class ThreadDemo02 {
+    public static void main(String[] args) {
+
+    }
 }
