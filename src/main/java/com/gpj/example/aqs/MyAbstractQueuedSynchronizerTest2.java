@@ -2,6 +2,7 @@ package com.gpj.example.aqs;
 
 import org.junit.Test;
 
+import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -11,9 +12,16 @@ import java.util.concurrent.locks.ReentrantLock;
  * @date ：2020/9/14 11:16 上午
  */
 public class MyAbstractQueuedSynchronizerTest2 {
-    @Test
-    public void testAbstractQueuedSynchronizer() {
-        Lock lock = new ReentrantLock();
+
+    private static String unlock = "unlock";
+    private static String tryUnlock = "tryUnlock";
+
+    public static void main(String[] args) throws InterruptedException {
+        new MyAbstractQueuedSynchronizerTest2().testAbstractQueuedSynchronizer();
+    }
+
+    public void testAbstractQueuedSynchronizer() throws InterruptedException {
+        Lock lock = new ReentrantLock(true);
 
         Runnable runnable0 = new ReentrantLockThread(lock);
         Thread thread0 = new Thread(runnable0);
@@ -28,10 +36,18 @@ public class MyAbstractQueuedSynchronizerTest2 {
         thread2.setName("线程2");
 
         thread0.start();
+        //Thread.sleep(100);
         thread1.start();
-        thread2.start();
+        //thread2.start();
 
-        for (;;) {}
+        Scanner scanner = new Scanner(System.in);
+        for (;;) {
+            String s = scanner.nextLine();
+            System.out.println(s);
+            tryUnlock = s;
+        }
+
+        //for (;;) {}
     }
 
     private static class ReentrantLockThread implements Runnable {
@@ -46,7 +62,11 @@ public class MyAbstractQueuedSynchronizerTest2 {
         public void run() {
             try {
                 lock.lock();
-                for (;;){}
+                for (;;){
+                    if (unlock.equals(tryUnlock) && "线程0".equals(Thread.currentThread().getName())) {
+                        break;
+                    }
+                }
             } finally {
                 lock.unlock();
             }

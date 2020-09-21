@@ -43,7 +43,7 @@ public class MyAbstractQueueSynchronizer {
             /*boolean b = compareAndSetState(0, 1);
             boolean b1 = compareAndSetState(0, 1);
             System.out.println("b:"+b+ " ,b1:" +b1);*/
-            if(compareAndSetState(0, 1)) {
+            if(compareAndSetState(0, acquires)) {
                 setExclusiveOwnerThread(Thread.currentThread());
                 return true;
             }
